@@ -1,0 +1,75 @@
+#include <iostream>
+#include <fstream>
+#include <cstring>
+#include <algorithm>
+#include <iterator>
+#include <vector>
+
+// Function to create the encryption/decryption mapping based on the keyword
+std::vector<char> createCipherMapping(const std::string& keyword) {
+    std::vector<char> mapping;
+    std::string uniqueKeyword = keyword;
+
+    // Remove duplicate letters from the keyword
+    std::sort(uniqueKeyword.begin(), uniqueKeyword.end());
+    auto last = std::unique(uniqueKeyword.begin(), uniqueKeyword.end());
+    uniqueKeyword.erase(last, uniqueKeyword.end());
+
+    // Append the other letters of the alphabet in reverse order
+    std::string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    for (char c : uniqueKeyword) {
+        mapping.push_back(c);
+        alphabet.erase(std::remove(alphabet.begin(), alphabet.end(), c), alphabet.end());
+    }
+
+    std::reverse(alphabet.begin(), alphabet.end());
+    mapping.insert(mapping.end(), alphabet.begin(), alphabet.end());
+
+    return mapping;
+}
+
+// Function to perform encryption or decryption
+void processFile(const std::string& inputFileName, const std::string& outputFileName, const std::string& keyword, bool decrypt) {
+    std::ifstream inputFile(inputFileName);
+    std::ofstream outputFile(outputFileName);
+
+    if (!inputFile.is_open() || !outputFile.is_open()) {
+        std::cerr << "Error opening files." << std::endl;
+        return;
+    }
+
+    // Create the cipher mapping based on the keyword
+    std::vector<char> cipherMapping = createCipherMapping(keyword);
+
+    char ch;
+    while (inputFile.get(ch)) {
+        if (std::isalpha(ch)) {
+            // Encrypt or decrypt the letter based on the mapping
+            char baseChar = std::islower(ch) ? 'a' : 'A';
+            char encryptedChar = decrypt ? cipherMapping[ch - baseChar] : cipherMapping[ch - baseChar + 26];
+            outputFile.put(encryptedChar);
+        } else {
+            // Preserve non-alphabetic characters
+            outputFile.put(ch);
+        }
+    }
+
+    inputFile.close();
+    outputFile.close();
+}
+
+int main(int argc, char* argv[]) {
+    if (argc != 5 || (strcmp(argv[1], "-e") != 0 && strcmp(argv[1], "-d") != 0)) {
+        std::cerr << "Usage: " << argv[0] << " -e/-d -k<keyword> <inputFile> <outputFile>" << std::endl;
+        return 1;
+    }
+
+    bool decrypt = (strcmp(argv[1], "-d") == 0);
+    std::string keyword = argv[2] + 2; // Remove the '-k' prefix from the keyword
+
+    processFile(argv[3], argv[4], keyword, decrypt);
+
+    std::cout << (decrypt ? "Decryption" : "Encryption") << " complete." << std::endl;
+
+    return 0;
+}
