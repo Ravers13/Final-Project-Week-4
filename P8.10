@@ -1,0 +1,79 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+
+
+std::vector<std::vector<char>> createPlayfairMatrix(const std::string& keyword) {
+    std::vector<std::vector<char>> matrix(5, std::vector<char>(5, ' '));
+    std::string key = keyword + "ABCDEFGHIKLMNOPQRSTUVWXYZ";
+    key.erase(std::remove_if(key.begin(), key.end(), ::isspace), key.end());
+    std::sort(key.begin(), key.end());
+    key.erase(std::unique(key.begin(), key.end()), key.end());
+
+    size_t k = 0;
+    for (size_t i = 0; i < 5; ++i) {
+        for (size_t j = 0; j < 5; ++j) {
+            matrix[i][j] = key[k++];
+        }
+    }
+
+    return matrix;
+}
+
+
+std::pair<size_t, size_t> findLetterCoordinates(const std::vector<std::vector<char>>& matrix, char letter) {
+    for (size_t i = 0; i < 5; ++i) {
+        for (size_t j = 0; j < 5; ++j) {
+            if (matrix[i][j] == letter) {
+                return std::make_pair(i, j);
+            }
+        }
+    }
+    return std::make_pair<size_t, size_t>(-1, -1); 
+}
+
+
+std::string playfairEncryptDecryptPair(const std::vector<std::vector<char>>& matrix, char a, char b, bool decrypt = false) {
+    auto [aRow, aCol] = findLetterCoordinates(matrix, a);
+    auto [bRow, bCol] = findLetterCoordinates(matrix, b);
+
+    if (aRow == bRow) {
+        return decrypt ? 
+            std::string(1, matrix[aRow][(aCol + 4) % 5]) + matrix[bRow][(bCol + 4) % 5] :
+            std::string(1, matrix[aRow][(aCol + 1) % 5]) + matrix[bRow][(bCol + 1) % 5];
+    } else if (aCol == bCol) {
+        return decrypt ? 
+            std::string(1, matrix[(aRow + 4) % 5][aCol]) + matrix[(bRow + 4) % 5][bCol] :
+            std::string(1, matrix[(aRow + 1) % 5][aCol]) + matrix[(bRow + 1) % 5][bCol];
+    } else {
+        return std::string(1, matrix[aRow][bCol]) + matrix[bRow][aCol];
+    }
+}
+
+
+std::string playfairCipher(const std::string& input, const std::string& keyword, bool decrypt = false) {
+    std::vector<std::vector<char>> matrix = createPlayfairMatrix(keyword);
+    std::string result;
+
+    for (size_t i = 0; i < input.length(); i += 2) {
+        char a = input[i];
+        char b = (i + 1 < input.length()) ? input[i + 1] : 'X'; // Use 'X' for odd-length pairs
+        result += playfairEncryptDecryptPair(matrix, a, b, decrypt);
+    }
+
+    return result;
+}
+
+int main() {
+    std::string inputText = "HELLO";
+    std::string keyword = "PLAYFAIR";
+
+
+    std::string encryptedText = playfairCipher(inputText, keyword);
+    std::cout << "Encrypted: " << encryptedText << std::endl;
+
+    std::string decryptedText = playfairCipher(encryptedText, keyword, true);
+    std::cout << "Decrypted: " << decryptedText << std::endl;
+
+    return 0;
