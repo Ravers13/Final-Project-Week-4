@@ -1,0 +1,26 @@
+1. Open the dictionary file located at "/usr/share/dict/words".
+2. Check if the dictionary file is successfully opened; if not, print an error message and exit the program.
+
+3. Initialize an empty vector of strings called "dictionaryWords".
+4. Initialize an empty string variable called "word".
+
+5. Loop through each word in the dictionary file:
+   a. Read a word from the file and store it in the variable "word".
+   b. Convert the word to lowercase using std::transform.
+   c. Add the lowercase word to the "dictionaryWords" vector.
+
+6. Close the dictionary file.
+
+7. Open the file to be checked ("file_to_check.txt").
+8. Check if the file to be checked is successfully opened; if not, print an error message and exit the program.
+
+9. Loop through each word in the file to be checked:
+   a. Read a word from the file and store it in the variable "word".
+   b. Convert the word to lowercase using std::transform.
+
+   c. Check if the lowercase word is not found in the "dictionaryWords" vector:
+      i. If not found, print "Misspelled word: " followed by the word.
+
+10. Close the file to be checked.
+
+11. Exit the program with a success code (0).
