@@ -1,0 +1,38 @@
+Function createCipherMapping
+
+Input: keyword (string)
+Output: mapping (vector of characters)
+Steps:
+Initialize an empty vector mapping.
+Create a copy of the keyword and remove duplicate letters.
+Sort the unique keyword.
+Iterate through each character c in the unique keyword:
+Append c to the mapping.
+Remove c from the alphabet string.
+Reverse the remaining alphabet string.
+Append the reversed alphabet to the mapping.
+Function processFile
+
+Input: inputFileName (string), outputFileName (string), keyword (string), decrypt (boolean)
+Output: None (void)
+Steps:
+Open input and output files (inputFile, outputFile).
+Check if files are opened successfully, else print an error and return.
+Create a cipher mapping using createCipherMapping with the given keyword.
+Iterate through each character ch in the input file:
+If ch is an alphabetic character:
+Determine the base character ('a' or 'A').
+Calculate the index for encryption or decryption.
+Write the encrypted or decrypted character to the output file.
+If ch is not an alphabetic character, preserve it in the output.
+Close both input and output files.
+Function main
+
+Input: Command line arguments (argc, argv[])
+Output: Return 0 on success, 1 on failure
+Steps:
+Check if the correct number of command line arguments is provided.
+Check if the operation is encryption (-e) or decryption (-d).
+Extract the keyword from the command line argument (-k<keyword>).
+Call processFile with input file, output file, keyword, and operation.
+Print a message indicating whether encryption or decryption is complete.
