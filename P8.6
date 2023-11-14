@@ -1,0 +1,60 @@
+#include <iostream>
+#include <fstream>
+#include <cctype> // For isspace function
+
+int main() {
+    std::ifstream inputFile("how_to_1/worldpop.txt");
+
+    if (!inputFile.is_open()) {
+        std::cerr << "Error opening the file." << std::endl;
+        return 1;
+    }
+
+    long long totalPopulation = 0;
+    std::string line;
+
+    while (std::getline(inputFile, line)) {
+        std::string countryName;
+        bool isEuropeanUnion = false;
+
+        for (char& c : line) {
+            if (!std::isspace(c)) {
+                if (isEuropeanUnion) {
+                    // Skip characters after "European Union"
+                    continue;
+                }
+
+                // Add non-whitespace characters to the country name
+                countryName += c;
+            } else {
+                // Check if the next non-whitespace character is a digit
+                char nextChar = inputFile.peek();
+
+                if (std::isdigit(nextChar)) {
+                    // Read the number and add it to the total population
+                    long long population;
+                    inputFile >> population;
+                    totalPopulation += population;
+                    break;
+                } else {
+                    // Add a space and the next non-whitespace character to the country name
+                    countryName += ' ';
+                    inputFile >> std::noskipws >> c; // Read the next non-whitespace character
+                    countryName += c;
+
+                    // Check if the country is "European Union"
+                    if (countryName == "European Union") {
+                        isEuropeanUnion = true;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    inputFile.close();
+
+    std::cout << "Total population (excluding European Union): " << totalPopulation << std::endl;
+
+    return 0;
+}
